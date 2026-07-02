@@ -1,0 +1,1 @@
+- [SkillBridge Next.js setup](skillbridge-nextjs.md) — supabase-js v2.110+ requires createClient<any>; RLS has 3-layer defence; middleware uses JWT expiry check not network call.
