@@ -1,44 +1,47 @@
-'use client';
+"use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { Briefcase, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { useState, useEffect, Suspense } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { Briefcase, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
-  const [tab, setTab] = useState<'signin' | 'signup'>(
-    searchParams?.get('tab') === 'signup' ? 'signup' : 'signin'
+  const [tab, setTab] = useState<"signin" | "signup">(
+    searchParams?.get("tab") === "signup" ? "signup" : "signin",
   );
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
+  const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
 
   useEffect(() => {
     if (!authLoading && user) {
-      router.replace('/dashboard');
+      router.replace("/dashboard");
     }
   }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccessMsg('');
+    setError("");
+    setSuccessMsg("");
     setLoading(true);
 
     try {
-      if (tab === 'signin') {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (tab === "signin") {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
         if (error) throw error;
-        router.push('/dashboard');
+        router.push("/dashboard");
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -46,11 +49,17 @@ function LoginForm() {
           options: { data: { full_name: fullName } },
         });
         if (error) throw error;
-        setSuccessMsg('Account created! Check your email to confirm your address, then sign in.');
-        setTab('signin');
+        setSuccessMsg(
+          "Account created! Check your email to confirm your address, then sign in.",
+        );
+        setTab("signin");
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
@@ -78,12 +87,12 @@ function LoginForm() {
             </span>
           </Link>
           <h1 className="text-2xl font-bold text-slate-900">
-            {tab === 'signin' ? 'Welcome back' : 'Create your account'}
+            {tab === "signin" ? "Welcome back" : "Create your account"}
           </h1>
           <p className="text-slate-500 mt-1 text-sm">
-            {tab === 'signin'
-              ? 'Sign in to access your dashboard'
-              : 'Join thousands of freelancers and clients'}
+            {tab === "signin"
+              ? "Sign in to access your dashboard"
+              : "Join thousands of freelancers and clients"}
           </p>
         </div>
 
@@ -91,21 +100,29 @@ function LoginForm() {
           {/* Tabs */}
           <div className="flex border-b border-slate-200">
             <button
-              onClick={() => { setTab('signin'); setError(''); setSuccessMsg(''); }}
+              onClick={() => {
+                setTab("signin");
+                setError("");
+                setSuccessMsg("");
+              }}
               className={`flex-1 py-4 text-sm font-semibold transition-colors ${
-                tab === 'signin'
-                  ? 'text-brand-600 border-b-2 border-brand-600 bg-brand-50/50'
-                  : 'text-slate-500 hover:text-slate-700'
+                tab === "signin"
+                  ? "text-brand-600 border-b-2 border-brand-600 bg-brand-50/50"
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               Sign In
             </button>
             <button
-              onClick={() => { setTab('signup'); setError(''); setSuccessMsg(''); }}
+              onClick={() => {
+                setTab("signup");
+                setError("");
+                setSuccessMsg("");
+              }}
               className={`flex-1 py-4 text-sm font-semibold transition-colors ${
-                tab === 'signup'
-                  ? 'text-brand-600 border-b-2 border-brand-600 bg-brand-50/50'
-                  : 'text-slate-500 hover:text-slate-700'
+                tab === "signup"
+                  ? "text-brand-600 border-b-2 border-brand-600 bg-brand-50/50"
+                  : "text-slate-500 hover:text-slate-700"
               }`}
             >
               Create Account
@@ -113,6 +130,33 @@ function LoginForm() {
           </div>
 
           <form onSubmit={handleSubmit} className="p-8 space-y-5">
+            {tab === "signin" && (
+              <>
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-slate-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-white px-2 text-slate-500">or</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await supabase.auth.signInWithOAuth({
+                      provider: "google",
+                      options: {
+                        redirectTo: `${window.location.origin}/auth/callback`,
+                      },
+                    });
+                  }}
+                  className="w-full border border-slate-300 rounded-xl py-3 font-semibold hover:bg-slate-50"
+                >
+                  Continue with Google
+                </button>
+              </>
+            )}
             {successMsg && (
               <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm flex items-start gap-3">
                 <span className="text-emerald-500 mt-0.5">✓</span>
@@ -126,9 +170,11 @@ function LoginForm() {
               </div>
             )}
 
-            {tab === 'signup' && (
+            {tab === "signup" && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Full Name</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  Full Name
+                </label>
                 <input
                   type="text"
                   value={fullName}
@@ -141,7 +187,9 @@ function LoginForm() {
             )}
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">Email Address</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                Email Address
+              </label>
               <input
                 type="email"
                 value={email}
@@ -154,21 +202,28 @@ function LoginForm() {
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-slate-700">Password</label>
-                {tab === 'signin' && (
-                  <button type="button" className="text-xs text-brand-600 hover:text-brand-700 font-medium">
+                <label className="block text-sm font-medium text-slate-700">
+                  Password
+                </label>
+                {tab === "signin" && (
+                  <button
+                    type="button"
+                    className="text-xs text-brand-600 hover:text-brand-700 font-medium"
+                  >
                     Forgot password?
                   </button>
                 )}
               </div>
               <div className="relative">
                 <input
-                  type={showPassword ? 'text' : 'password'}
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder={tab === 'signup' ? 'Min. 8 characters' : '••••••••'}
+                  placeholder={
+                    tab === "signup" ? "Min. 8 characters" : "••••••••"
+                  }
                   required
-                  minLength={tab === 'signup' ? 8 : undefined}
+                  minLength={tab === "signup" ? 8 : undefined}
                   className="w-full px-4 py-3 pr-12 rounded-xl border border-slate-300 text-slate-900 placeholder-slate-400 text-sm input-focus"
                 />
                 <button
@@ -176,7 +231,11 @@ function LoginForm() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4" />
+                  ) : (
+                    <Eye className="w-4 h-4" />
+                  )}
                 </button>
               </div>
             </div>
@@ -187,25 +246,36 @@ function LoginForm() {
               className="w-full py-3.5 gradient-card text-white font-semibold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-60 flex items-center justify-center gap-2 shadow-sm"
             >
               {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              {tab === 'signin' ? 'Sign In' : 'Create Account'}
+              {tab === "signin" ? "Sign In" : "Create Account"}
             </button>
 
             <p className="text-center text-xs text-slate-500 leading-relaxed">
-              By continuing, you agree to SkillBridge&apos;s{' '}
-              <Link href="#" className="text-brand-600 hover:underline">Terms of Service</Link>
-              {' '}and{' '}
-              <Link href="#" className="text-brand-600 hover:underline">Privacy Policy</Link>.
+              By continuing, you agree to SkillBridge&apos;s{" "}
+              <Link href="#" className="text-brand-600 hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="#" className="text-brand-600 hover:underline">
+                Privacy Policy
+              </Link>
+              .
             </p>
           </form>
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-6">
-          {tab === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
+          {tab === "signin"
+            ? "Don't have an account?"
+            : "Already have an account?"}{" "}
           <button
-            onClick={() => { setTab(tab === 'signin' ? 'signup' : 'signin'); setError(''); setSuccessMsg(''); }}
+            onClick={() => {
+              setTab(tab === "signin" ? "signup" : "signin");
+              setError("");
+              setSuccessMsg("");
+            }}
             className="text-brand-600 font-semibold hover:underline"
           >
-            {tab === 'signin' ? 'Sign Up' : 'Sign In'}
+            {tab === "signin" ? "Sign Up" : "Sign In"}
           </button>
         </p>
       </div>
@@ -215,7 +285,13 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="w-8 h-8 text-brand-600 animate-spin" /></div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-brand-600 animate-spin" />
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );
