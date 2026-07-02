@@ -1,17 +1,20 @@
-import { createClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 /**
- * Supabase client — deliberately un-typed at the Supabase boundary.
+ * Browser Supabase client for client-side operations.
+ * Uses @supabase/ssr which properly handles session persistence via cookies.
  *
- * supabase-js v2.110.0 changed the generic inference chain for
- * insert/update/upsert such that hand-written Database types fail the
- * internal `GenericTable` constraint, causing the `values` parameter to
- * resolve to `never[]`.  We keep all our application-level types in
- * `types/database.ts` and cast at the query call sites rather than relying on
- * the Supabase client generic.
+ * Session management:
+ * - Sessions are stored in cookies by the SSR adapter
+ * - Cookies are automatically sent with all requests
+ * - Middleware can read cookies to validate auth on protected routes
+ * - Token refresh is automatic
+ *
+ * Note: We keep types as `any` because supabase-js v2 generic inference
+ * can break custom Database type definitions. Cast at call sites instead.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const supabase = createClient<any>(supabaseUrl, supabaseAnonKey);
+export const supabase = createBrowserClient<any>(supabaseUrl, supabaseAnonKey);
