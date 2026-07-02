@@ -1,5 +1,5 @@
-import { createServerClient } from '@supabase/ssr';
-import type { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 /**
  * Update session in middleware and return a response with updated cookies.
@@ -21,6 +21,7 @@ export async function updateSession(request: NextRequest) {
   response = new NextResponse(null, { status: 999 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { createServerClient } = await import('@supabase/ssr');
   const supabase = createServerClient<any>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
