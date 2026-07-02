@@ -11,8 +11,8 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
-  const [tab, setTab] = useState<"signin" | "signup">(
-    searchParams?.get("tab") === "signup" ? "signup" : "signin",
+  const [tab, setTab] = useState<'signin' | 'signup'>(
+    searchParams?.get('tab') === 'signup' ? 'signup' : 'signin'
   );
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -261,6 +261,9 @@ function LoginForm() {
               .
             </p>
           </form>
+          <button type="button" style={{background:"red",color:"white",padding:"10px"}}>
+            TEST BUTTON
+          </button>
         </div>
 
         <p className="text-center text-sm text-slate-500 mt-6">
